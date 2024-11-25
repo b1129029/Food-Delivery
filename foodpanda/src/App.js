@@ -1,68 +1,65 @@
-import React from "react";
-import { Container, Typography, Box, Grid, Link } from "@mui/material";
+import React, { useState } from "react";
+import { restaurantData } from "./data/restaurants";
+import CityGrid from "./components/CityGrid";
+import RestaurantGrid from "./components/RestaurantGrid";
+import NavigationBreadcrumbs from "./components/NavigationBreadcrumbs";
+import RestaurantDetails from "./components/RestaurantDetails"
 import Header from "./components/Header";
-import Card from "./components/CityGrid";
+import Footer from "./components/Footer";
 
 const App = () => {
-  const restaurants = [
-    "八方雲集",
-    "麥味登",
-    "路易莎咖啡",
-    "McDonald's 麥當勞",
-    "春水堂",
-    "拉亞漢堡",
-    "大埔鐵板燒",
-    "吉野家 Yoshinoya",
-    "海底撈",
-    "點點心",
-    "鬍鬚張滷肉飯",
-    "Subway",
-    "摩斯漢堡 Mos Burger",
-    "大呼過癮",
-    "大戶屋",
-    "迷客夏",
-    "麗媽香香鍋",
-    "不可熟成紅茶",
-    "Isaac Toast & Coffee",
-  ];
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
-  const cuisines = [
-    "台北市", "新北市", "高雄市", "台中市", "印度料理", "日式料理",
-    "美式料理", "中式料理", "壽司外送", "麵包蛋糕", "飲料外送", "素食料理",
-  ];
+  // 選擇城市
+  const handleCityClick = (cityName) => {
+    setSelectedCity(cityName);
+    setSelectedRestaurant(null); // 確保不會顯示上一個選擇的餐廳
+  };
+
+  // 返回城市選擇
+  const handleBackToHome = () => {
+    setSelectedCity(null);
+    setSelectedRestaurant(null);
+  };
+
+  // 返回餐廳列表
+  const handleBackToRestaurants = () => {
+    setSelectedRestaurant(null);
+  };
+
+  // 選擇餐廳
+  const handleRestaurantClick = (restaurant) => {
+    setSelectedRestaurant(restaurant);
+  };
+
+  const filteredRestaurants = selectedCity
+    ? restaurantData.filter((restaurant) => restaurant.city === selectedCity)
+    : [];
 
   return (
-    
-    <Container maxWidth="lg">
+    <div>
       <Header />
-      <Card />
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          熱門餐廳
-        </Typography>
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-          {restaurants.map((name, index) => (
-            <Link href="#" key={index} underline="hover" color="inherit" sx={{ fontSize: "1rem" }}>
-              {name}
-            </Link>
-          ))}
-        </Box>
-      </Box>
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          熱門料理
-        </Typography>
-        <Grid container spacing={2}>
-          {cuisines.map((cuisine, index) => (
-            <Grid item xs={6} sm={4} md={3} key={index}>
-              <Link href="#" underline="hover" color="inherit" sx={{ fontSize: "1rem", display: "block" }}>
-                {cuisine}
-              </Link>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    </Container>
+      <NavigationBreadcrumbs
+        selectedCity={selectedCity}
+        selectedRestaurant={selectedRestaurant}
+        onBackToHome={handleBackToHome}
+        onBackToRestaurants={handleBackToRestaurants}
+      />
+      {!selectedCity ? (
+        <CityGrid onCityClick={handleCityClick} />
+      ) : selectedRestaurant ? (
+        <RestaurantDetails
+          restaurant={selectedRestaurant}
+        />
+      ) : (
+        <RestaurantGrid
+          restaurants={filteredRestaurants}
+          onRestaurantClick={handleRestaurantClick}
+        />
+      )}
+      <Footer />
+    </div>
   );
 };
 
